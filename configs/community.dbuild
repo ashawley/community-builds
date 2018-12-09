@@ -534,7 +534,7 @@ build += {
     // scala.concurrent.stm.CommitBarrierSuite failing;
     // reported upstream at https://github.com/nbronson/scala-stm/issues/53
     // (report updated December 2017)
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   ${vars.base} {
@@ -544,7 +544,7 @@ build += {
     // [info] java.io.FileNotFoundException: Could not locate [~/.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.11.0.jar].
     // January 2018: failure's continued existence confirmed
     // see https://github.com/scala/community-builds/pull/387
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   ${vars.base} {
@@ -649,7 +649,7 @@ build += {
     // reconfirmed January 2018 that some tests are failing. in one run, it was:
     // * akka.http.impl.engine.client.NewConnectionPoolSpec
     // * akka.http.impl.engine.client.HostConnectionPoolSpec
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   ${vars.base} {
@@ -736,7 +736,7 @@ build += {
     // no Scala.js plz
     extra.projects: ["utestJVM"]
     // waiting for fix on https://github.com/lihaoyi/utest/issues/168
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   // forked (October 2018) for JDK 11 compat, awaiting merge of
@@ -894,7 +894,7 @@ build += {
     // repeated hangs during testing; see
     // https://github.com/scala/community-builds/issues/560
     // (last confirmed: January 2018)
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   ${vars.base} {
@@ -1091,7 +1091,7 @@ build += {
     ]
     check-missing: false  // ignore missing scalafmt
     // Known test failures: https://github.com/sirthias/scala-ssh/issues/38
-    extra.test-tasks: "compile"
+    extra.test-tasks: "test:compile"
   }
 
   ${vars.base} {
@@ -1190,7 +1190,7 @@ build += {
     ]
     // reported test failure upstream:
     // https://github.com/typesafehub/akka-contrib-extra/issues/74
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   ${vars.base} {
@@ -1252,7 +1252,7 @@ build += {
     // there is a post-2.12.6 failure because a test is sensitive
     // Iterator#toString format.  we could re-enable once 2.12.7
     // is released and the repo has upgraded
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   ${vars.base} {
@@ -1274,7 +1274,7 @@ build += {
     name: "scalaj-http"
     uri:  ${vars.uris.scalaj-http-uri}
     // https://github.com/scalaj/scalaj-http/issues/164
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   ${vars.base} {
@@ -1298,7 +1298,7 @@ build += {
     uri:  ${vars.uris.scala-gopher-uri}
     // too many intermittent failures -- reported at
     // https://github.com/rssh/scala-gopher/issues/20
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   // dependency of scalameta
@@ -1387,7 +1387,7 @@ build += {
     // as of August 2017, doesn't compile against latest akka-http
     extra.exclude: ["akkaHttp"]
     // pending: https://github.com/eed3si9n/gigahorse/issues/54
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   // dependency of scalachess
@@ -1414,7 +1414,7 @@ build += {
     check-missing: false  // ignore missing scalafmt
     // DefaultWatchServiceSpec fails on MacOS only, see
     // https://github.com/scala/community-builds/pull/714
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   ${vars.base} {
@@ -1520,7 +1520,7 @@ build += {
       "set every bintrayReleaseOnPublish := false"
     ]
     // at least one test was hanging
-    extra.test-tasks: "compile"
+    extra.test-tasks: "test:compile"
   }
 
   // there are a *ton* of subprojects.  it might be interesting to try to add
@@ -1584,7 +1584,7 @@ build += {
     uri:  ${vars.uris.linter-uri}
     extra.sbt-version: ${vars.sbt-0-13-version}
     // test failures; see https://github.com/scala/community-builds/pull/696
-    extra.test-tasks: "compile"
+    extra.test-tasks: "test:compile"
   }
 
   ${vars.base} {
@@ -1614,7 +1614,7 @@ build += {
     // (in space "default") by any project in this configuration file."
     check-missing: false
     // (January 2018) "recursiveADT2" test fails
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
     // hopefully avoid intermittent OutOfMemoryErrors with default 1.5G heap?
     extra.options: ["-Xmx2048m"]
   }
@@ -1667,7 +1667,7 @@ build += {
     // this doesn't seem worth troubleshooting:
     // [scalasti] [error] Failed tests:
     // [scalasti] [error]       org.clapper.scalasti.StringTemplateSpec
-    extra.test-tasks: ["compile"]
+    extra.test-tasks: ["test:compile"]
   }
 
   // dependency of giter8
@@ -2240,7 +2240,7 @@ build += {
     uri:  ${vars.uris.github4s-uri}
     extra.projects: ["github4sJVM", "catsEffectJVM", "scalaz"]  // but no "docs" or Scala.js stuff
     // waiting (January 2018) on https://github.com/47deg/github4s/issues/178
-    extra.test-tasks: "compile"
+    extra.test-tasks: "test:compile"
   }
 
   ${vars.base} {
