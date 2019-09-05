@@ -51,8 +51,7 @@ jobs:
             - source-v1-
       - checkout
       - save_cache:
-          key:
-            - source-v1-{{ .Branch }}-{{ .Revision }}
+          key: source-v1-{{ .Branch }}-{{ .Revision }}
           paths:
             - ".git"
       - run: java -version
@@ -62,8 +61,7 @@ jobs:
             - clones-v1-
       - run: ./run.sh shapeless
       - save_cache:
-          key:
-            - clones-v1-{{ checksum "configs/project-refs.conf" }}
+          key: clones-v1-{{ checksum "configs/project-refs.conf" }}
           paths:
             - "clones-0.9.16"
 
