@@ -1,0 +1,80 @@
+version: 2.1
+
+executors:
+  scala_jdk8_executor:
+    docker:
+      - image: circleci/openjdk:8-jdk
+  scala_jdk11_executor:
+    docker:
+      - image: circleci/openjdk:11-jdk
+
+commands:
+  sbt_cmd:
+    description: "Build with sbt"
+    parameters:
+      scala_version:
+        type: string
+        default: 2.12.9
+      sbt_tasks:
+        type: string
+        default: update compile test:compile test doc package
+    steps:
+      - restore_cache:
+          keys:
+            - sbt-deps-v1-{{ checksum "build.sbt" }}
+            - sbt-deps-v1-
+          keys:
+            - source-v1-{{ .Branch }}-{{ .Revision }}
+            - source-v1-{{ .Branch }}
+            - source-v1-
+      - run: sbt ++<< parameters.scala_version >> << parameters.sbt_tasks >>
+      - save_cache:
+          key: sbt-deps-v1-{{ checksum "build.sbt" }}
+          paths:
+            - "~/.ivy2/cache"
+            - "~/.sbt"
+            - "~/.m2"
+
+jobs:
+  scala_job:
+    executor: scala_<<parameters.java_version>>_executor
+    parameters:
+      scala_version:
+        description: "Scala version"
+        default: 2.12.9
+        type: string
+      java_version:
+        description: "Java version"
+        default: jdk8
+        type: string
+    steps:
+      - restore_cache
+          keys:
+            - source-v1-{{ .Branch }}-{{ .Revision }}
+            - source-v1-{{ .Branch }}
+            - source-v1-
+      - checkout
+      - save_cache
+          keys:
+            - source-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - ".git"
+      - run: java -version
+      - restore_cache
+          keys:
+             - clones-v1-{{ checksum "configs/project-refs.conf" }}
+             - clones-v1-
+      - run: ./run.sh shapeless
+      - save_cache
+          keys:
+            - clones-v1-{{ checksum "configs/project-refs.conf" }}
+          paths:
+            - "clones-0.9.16"
+
+workflows:
+  build:
+    jobs:
+      - scala_job:
+          name: 2.13.0
+          java_version: jdk8
+          scala_version: 2.13.0
