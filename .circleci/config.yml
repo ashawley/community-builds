@@ -62,7 +62,7 @@ jobs:
             - clones-v1-
       - run: ./run.sh shapeless
       - save_cache:
-          keys:
+          key:
             - clones-v1-{{ checksum "configs/project-refs.conf" }}
           paths:
             - "clones-0.9.16"
