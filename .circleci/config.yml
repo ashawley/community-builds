@@ -57,11 +57,11 @@ jobs:
       - run: java -version
       - restore_cache:
           keys:
-            - clones-v1-{{ checksum "configs/project-refs.conf" }}
+            - clones-v1-{{ .Branch }}
             - clones-v1-
       - run: ./run.sh shapeless
       - save_cache:
-          key: clones-v1-{{ checksum "configs/project-refs.conf" }}
+          key: clones-v1-{{ .Branch }}
           paths:
             - "clones-0.9.16"
 
