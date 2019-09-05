@@ -51,7 +51,7 @@ jobs:
             - source-v1-
       - checkout
       - save_cache:
-          keys:
+          key:
             - source-v1-{{ .Branch }}-{{ .Revision }}
           paths:
             - ".git"
