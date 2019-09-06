@@ -48,7 +48,7 @@ vars {
   default-commands: []
   sbt-0-13-version: "0.13.18"
   sbt-1-2-version: "1.2.8"
-  sbt-version: "1.3.0-RC3"
+  sbt-version: "1.3.0-RC5"
 }
 
 //// compiler options manipulation
@@ -274,10 +274,6 @@ build += {
     name: "discipline"
     uri:  ${vars.uris.discipline-uri}
     extra.projects: ["coreJVM"]  // no Scala.js please
-    extra.commands: ${vars.default-commands} [
-      // sbt 1.3.0-RC3 specific: Credentials file [...] does not exist
-      "set every credentials := Seq()"
-    ]
   }
 
   // frozen (March 2018) at a March 2018 commit before an sbt-catalysts version
@@ -297,10 +293,6 @@ build += {
     name: "machinist"
     uri:  ${vars.uris.machinist-uri}
     extra.projects: ["machinistJVM"]  // no Scala.js please
-    extra.commands: ${vars.default-commands} [
-      // sbt 1.3.0-RC3 specific: Credentials file [...] does not exist
-      "set every credentials := Seq()"
-    ]
   }
 
   ${vars.base} {
@@ -345,7 +337,7 @@ build += {
     name: "kittens"
     uri:  ${vars.uris.kittens-uri}
     extra.projects: ["coreJVM"]  // sorry, Scala.js
-    deps.inject: ["org.typelevel#kind-projector"]
+    deps.inject: ${vars.base.deps.inject} ["org.typelevel#kind-projector"]
     extra.commands: ${vars.default-commands} [
       "removeDependency org.spire-math kind-projector"
       """set libraryDependencies in ThisBuild += compilerPlugin("org.typelevel" %% "kind-projector" % "0.0.0")"""
@@ -358,10 +350,6 @@ build += {
     name: "claimant"
     uri:  ${vars.uris.claimant-uri}
     extra.exclude: ["root", "mcJS", "coreJS"]  // no Scala.js plz
-    extra.commands: ${vars.default-commands} [
-      // sbt 1.3.0-RC3 specific: Credentials file [...] does not exist
-      "set every credentials := Seq()"
-    ]
   }
 
   ${vars.base} {
@@ -372,8 +360,6 @@ build += {
     extra.projects: ["core"]
     extra.commands: ${vars.default-commands} [
       "set every bintrayReleaseOnPublish := false"
-      // sbt 1.3.0-RC3 specific: Credentials file [...] does not exist
-      "set every credentials := Seq()"
     ]
     extra.options: ["-Dbintray.user=dummy", "-Dbintray.pass=dummy"]
     // ignore missing org.scala-sbt#scripted-plugin
@@ -386,7 +372,7 @@ build += {
   ${vars.base} {
     name: "scala-js"
     uri:  ${vars.uris.scala-js-uri}
-    // ScalaJSCrossVersion.scala:34:23: stable identifier required, but sbt.`package`.CrossVersion.Disabled found.
+    // 1.3.0-RC4: ScalaJSCrossVersion.scala:34:23: stable identifier required, but sbt.`package`.CrossVersion.Disabled found.
     extra.sbt-version: ${vars.sbt-1-2-version}
     extra.options: [
       // hopefully avoid intermittent OutOfMemoryErrors with default 1.5G heap?
@@ -428,8 +414,6 @@ build += {
     extra.commands: ${vars.default-commands} [
       // not sure if necessary, but we have it in the specs entry, so let's have it here too
       "set every publishMavenStyle := false"
-      // sbt 1.3.0-RC3 specific: Credentials file [...] does not exist
-      "set every credentials := Seq()"
     ]
   }
 
@@ -453,24 +437,10 @@ build += {
     // needs extra heap to even compile
     extra.options: ["-Xmx3072m"]
     extra.commands: ${vars.default-commands} [
-      // (well this one of those things where if I'd known in advance how many of these
-      // exclusions we were going to need... oh well.......)
-      // these failures are reproducible (most of them? after a while I stopped checking them all)
-      // outside dbuild on vanilla 2.13.0, so, not investigated. it's pretty hard to figure out
-      // where 3.0.x's 2.13 support even is, perhaps the fixes are on some scalatest branch I failed to locate.
-      // anyway, reassess when we move to ScalaTest 3.1
-      // part 1: managed sources
-      """set managedSources in Test in genRegularTests1 ~= (_.filterNot(_.getName == "ListShouldContainOnlyLogicalAndSpec.scala").filterNot(_.getName == "ListShouldContainOnlyLogicalOrSpec.scala"))"""
-      """set managedSources in Test in genRegularTests2 ~= (_.filterNot(_.getName == "EveryShouldContainOnlyLogicalOrSpec.scala"))"""
-      """set managedSources in Test in genMustMatchersTests1 ~= (_.filterNot(_.getName == "ListMustContainOnlyLogicalAndSpec.scala").filterNot(_.getName == "ListMustContainOnlyLogicalOrSpec.scala"))"""
-      """set managedSources in Test in genMustMatchersTests2 ~= (_.filterNot(_.getName.startsWith("EveryMustContainOnly")))"""
-      """set managedSources in Test in genMustMatchersTests3 ~= (_.filterNot(_.getName == "ListMustContainOnlySpec.scala"))"""
-      """set managedSources in Test in genRegularTests3 ~= (_.filterNot(_.getName == "ListShouldContainOnlyLogicalOrSpec.scala"))"""
-      """set managedSources in Test in genRegularTests4 ~= (_.filterNot(_.getName == "FrameworkSuite.scala").filterNot(_.getName == "InsideMixinSpec.scala"))"""
-      """set managedSources in Test in genContainTests2 ~= (_.filterNot(_.getName.containsSlice("ShouldContainOnly")))"""
-      // part 2: unmanaged sources
-      """set excludeFilter in (Test, unmanagedSources) in scalacticTest := HiddenFileFilter || "ChainSpec.scala" || "ChainTest.scala" || "EverySpec.scala""""
-      """set excludeFilter in (Test, unmanagedSources) in scalatestTest := HiddenFileFilter || "EveryShouldContainOnlySpec.scala" || "ListShouldContainOnlySpec.scala" || "ListShouldContainOnlyLogicalAndSpec.scala" || "EveryShouldContainOnlyLogicalAndSpec.scala" || "EveryShouldContainOnlyLogicalOrSpec.scala" || "FrameworkSuite.scala" || "ListShouldContainOnlyLogicalOrSpec.scala" || "InsideMixinSpec.scala" || "InsideSpec.scala" || "RetriesSpec.scala""""
+      // prone to intermittent failure
+      """set excludeFilter in (Test, unmanagedSources) in scalatestTest := HiddenFileFilter || "AsyncFunSpecSpec.scala" || "AsyncFunSpecSpec2.scala" || "WaitersSpec.scala" || "ScalaFuturesSpec.scala" || "DispatchReporterSpec.scala" || "AsyncFunSpecLikeSpec2.scala" || "JUnitSuiteSpec.scala" || "AsyncFeatureSpecLikeSpec2.scala" || "ConductorFixtureSuite.scala" || "AsyncAssertionsSpec.scala" || "ConductorFixtureDeprecatedSuite.scala" || "TimeLimitsSpec.scala" || "JavaFuturesSpec.scala" || "TestThreadsStartingCounterSpec.scala""""
+      """set managedSources in Test in genRegularTests4 ~= (_.filterNot(_.getName == "TimeLimitsSpec.scala").filterNot(_.getName == "AsyncAssertionsSpec.scala").filterNot(_.getName == "WaitersSpec.scala").filterNot(_.getName == "AsyncFeatureSpecSpec.scala").filterNot(_.getName == "ConductorFixtureSuite.scala"))"""
+      """set managedSources in Test in genRegularTests5 ~= (_.filterNot(_.getName == "AsyncFunSpecSpec2.scala").filterNot(_.getName == "TimeoutsSpec.scala"))"""
     ]
   }
 
@@ -506,10 +476,10 @@ build += {
     name: "cats-effect"
     uri:  ${vars.uris.cats-effect-uri}
     extra.projects: ["coreJVM", "lawsJVM"]  // no Scala.js plz
-    extra.commands: ${vars.base.extra.commands} [
-      // I think cats dropped its catalysts dependency but there is one source file
-      // in cats-effect that still expects it to be there, though not explicitly declared.
-      "set libraryDependencies in coreJVM += \"org.typelevel\" % \"catalysts-platform\" % \"0.10.0\" % Test"
+    deps.inject: ${vars.base.deps.inject} ["org.typelevel#kind-projector"]
+    extra.commands: ${vars.default-commands} [
+      "removeDependency org.spire-math kind-projector"
+      """set libraryDependencies in ThisBuild += compilerPlugin("org.typelevel" %% "kind-projector" % "0.0.0")"""
     ]
     deps.inject: ${vars.base.deps.inject} ["org.typelevel#catalysts-platform"]
   }
@@ -518,6 +488,17 @@ build += {
   ${vars.base} {
     name: "fs2"
     uri:  ${vars.uris.fs2-uri}
+    // sbt 1.3.0-RC4 gives:
+    // [fs2] [error] java.lang.IllegalArgumentException: argument type mismatch
+    // [fs2] [error] 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+    // [fs2] [error] 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+    // [fs2] [error] 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+    // [fs2] [error] 	at java.lang.reflect.Method.invoke(Method.java:498)
+    // [fs2] [error] 	at scala.reflect.runtime.JavaMirrors$JavaMirror$JavaVanillaMethodMirror3.jinvokeraw(JavaMirrors.scala:408)
+    // [fs2] [error] 	at scala.reflect.runtime.JavaMirrors$JavaMirror$JavaMethodMirror.jinvoke(JavaMirrors.scala:354)
+    // [fs2] [error] 	at scala.reflect.runtime.JavaMirrors$JavaMirror$JavaVanillaMethodMirror.apply(JavaMirrors.scala:370)
+    // [fs2] [error] 	at com.lucidchart.sbt.scalafmt.CachePlatform$.fileInfo(Platform.scala:24)
+    extra.sbt-version: "1.3.0-RC3"
     extra.projects: ["coreJVM", "io", "reactiveStreams"]  // no Scala.js, no benchmarks or docs
     extra.commands: ${vars.base.extra.commands} [
       // otherwise sbt-gpg errors on `publish`
@@ -550,6 +531,11 @@ build += {
     name: "mouse"
     uri:  ${vars.uris.mouse-uri}
     extra.projects: ["crossJVM"]  // no Scala.js please
+    deps.inject: ${vars.base.deps.inject} ["org.typelevel#kind-projector"]
+    extra.commands: ${vars.default-commands} [
+      "removeDependency org.spire-math kind-projector"
+    ]
+
   }
 
   ${vars.base} {
@@ -558,20 +544,27 @@ build += {
     extra.projects: ["minitestJVM", "lawsJVM", "lawsLegacyJVM"]  // no Scala.js
   }
 
-  // forked awaiting merge of https://github.com/monix/monix/pull/875
   ${vars.base} {
     name: "monix"
     uri:  ${vars.uris.monix-uri}
     extra.options: ["-Dmonix.requireJava8=false"]
     // no Scala.js, no benchmarks.
     extra.projects: ["coreJVM"]
-    extra.commands: ${vars.default-commands} [
-      // 2.13: some tests hang; not investigated or reported upstream; we should re-check when we unfork
-      """set excludeFilter in (Test, unmanagedSources) in evalJVM := HiddenFileFilter || "TaskAsyncAutoShiftJVMSuite.scala""""
-      """set excludeFilter in (Test, unmanagedSources) in reactiveJVM := HiddenFileFilter || "OverflowStrategyUnboundedConcurrencySuite.scala""""
-    ]
   }
 
+  // frozen (July 2019) at June 2019 commit just before ScalaTest 3.1 upgrade.
+  // note that at the time we unfreeze, we can move to the master which
+  // is now cats-based, instead of having to use a branch like before
+  ${vars.base} {
+    name: "monocle"
+    uri:  ${vars.uris.monocle-uri}
+    // try to enable more subprojects?
+    extra.projects: ["coreJVM", "macrosJVM", "lawJVM", "genericJVM"]
+  }
+
+  // frozen (April 2019) at a March 2019 commit before PR #440
+  // started causing netty-related compile errors, downstream
+  // in dispatch. I didn't investigate
   ${vars.base} {
     name: "unfiltered"
     uri:  ${vars.uris.unfiltered-uri}
@@ -583,12 +576,12 @@ build += {
     uri:  ${vars.uris.dispatch-uri}
   }
 
+  // there is a `develop` branch, but it requires a snapshot version of the scrooge sbt plugin,
+  // so we track `master`
   ${vars.base} {
     name: "log4s"
     uri:  ${vars.uris.log4s-uri}
     extra.exclude: ["coreJS", "testingJS"]
-    // failed tests on 1.3; not investigated
-    extra.sbt-version: ${vars.sbt-1-2-version}
   }
 
   // frozen (May 2019) at May 2019 commit just before ScalaTest 3.1 upgrade
@@ -750,9 +743,6 @@ build += {
   ${vars.base} {
     name: "circe"
     uri:  ${vars.uris.circe-uri}
-    // failed compilation on sbt 1.3.0-RC3; not investigated
-    // Symbol 'type io.circe.java8.time.JavaTimeDecoders' is missing from the classpath
-    extra.sbt-version: ${vars.sbt-1-2-version}
     extra.projects: [
       // easy
       "coreJVM", "numbersJVM"
@@ -795,11 +785,6 @@ build += {
     // it with right now.
     extra.projects: ["catsJVM", "coreJVM", "evalJVM", "jsonpathJVM", "scalacheckJVM", "shapelessJVM"]
     extra.exclude: ["scalacheck_1_13JVM"]
-    extra.commands: ${vars.default-commands} [
-      // as per https://github.com/fthomas/refined/issues/661 , this test can be re-enabled
-      // once the repo is upgraded to 2.13.1
-      """set coreJVM / Test / unmanagedSources / excludeFilter := HiddenFileFilter || "AdjacentSpec.scala""""
-    ]
   }
 
   // core doesn't depend on refined, but refinedJVM does.
@@ -808,6 +793,10 @@ build += {
     name: "decline"
     uri:  ${vars.uris.decline-uri}
     extra.projects: ["declineJVM", "refinedJVM"]  // no Scala.js, no doc
+    deps.inject: ${vars.base.deps.inject} ["org.typelevel#kind-projector"]
+    extra.commands: ${vars.default-commands} [
+      "removeDependency org.spire-math kind-projector"
+    ]
   }
 
   // dependency of lsp4s and scala-pet-store

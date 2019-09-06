@@ -1,7 +1,9 @@
 object Report extends App {
   def log = io.Source.fromFile(args(0))
   ClocReport(log)
-  SuccessReport(log)
+  val unexpectedFailureCount = SuccessReport(log)
+  SplitLog(log)
+  sys.exit(unexpectedFailureCount)
 }
 
 object ClocReport {
@@ -32,28 +34,27 @@ object SuccessReport {
   //   (?!-) = negative lookahead -- next character is not "-"
   val Regex = """\[info\] Project ((?:\w|-(?!-))+)-*: ([^\(]+) \((?:stuck on broken dependencies: )?(.*)\)""".r
 
-  val expectedToFail = Set(
-    "algebra",          // needs ScalaTest 3.1
-    "circe-jackson",    // needs ScalaTest 3.1
-    "coursier",         // weird git submodule problem when I tried to unfreeze to get 2.13 support. try again I guess
-    "curryhoward",      // no 2.13 upgrade (checked Aug 6 2019)
-    "doobie",           // needs newer cats-effect, which needs ScalaTest 3.1
-    "finagle",          // no 2.13 upgrade (checked Aug 12 2019)
-    "giter8",           // no 2.13 upgrade (checked Aug 6 2019)
-    "kittens",          // needs ScalaTest 3.1
-    "lagom",            // 2.13 support is in master (not 1.5.x) but also needs Akka 2.6
-    "lift-json",        // no 2.13 upgrade (checked Aug 6 2019)
-    "linter",           // no 2.13 upgrade (checked Aug 6 2019)
-    "metaconfig",       // no 2.13 upgrade (checked Aug 6 2019)
-    "metrics-scala",    // needs ScalaTest 3.1
-    "multibot",         // needs ScalaTest 3.1
-    "paradox",          // no 2.13 upgrade (checked Aug 6 2019)
-    "scalastyle",       // no 2.13 upgrade (checked Aug 6 2019)
-    "scrooge-shapes",   // no 2.13 upgrade (checked Aug 12 2019)
-    "tsec",             // needs ScalaTest 3.1
+  val jdk11Failures = Set(
+    "coursier",  // needs scala/bug#11125 workaround
+    "doobie",  // needs scala/bug#11125 workaround
+    "multibot",  //  - testScalaInterpreter *** FAILED ***; [java.lang.SecurityException: ("java.lang.RuntimePermission" "accessSystemModules")
+    "sbt-util",  // needs scala/bug#11125 workaround
+    "scala-debugger",  // "object FieldInfo is not a member of package sun.reflect"
+    "scala-refactoring",  // needs scala/bug#11125 workaround?
+    "scalafix",  // needs scala/bug#11125 workaround
+    "splain",  // needs scala/bug#11125 workaround
   )
 
-  def apply(log: io.Source): Unit = {
+  val expectedToFail: Set[String] =
+    System.getProperty("java.specification.version") match {
+      case "1.8" =>
+        Set(
+        )
+      case _ =>
+        jdk11Failures
+    }
+
+  def apply(log: io.Source): Int = {
     val lines = log.getLines.dropWhile(!_.contains("---==  Execution Report ==---"))
     var success, failed, didNotRun = 0
     val unexpectedSuccesses = collection.mutable.Buffer[String]()
@@ -95,7 +96,61 @@ object SuccessReport {
     println(s"FAILED: $failed")
     println(s"DID NOT RUN: $didNotRun")
     println(s"TOTAL: $total")
-    sys.exit(unexpectedFailures.size)
+    unexpectedFailures.size
+  }
+
+}
+
+object SplitLog {
+
+  val BeginDependencies = """\[info\] ---== Dependency Information ===---""".r
+  val EndDependencies = """\[info\] ---== ()End Dependency Information ===---""".r
+  val BeginExtract = """\[([^\]]+)\] --== Extracting dependencies for .+ ==--""".r
+  val EndExtract = """\[([^\]]+)\] --== End Extracting dependencies for .+ ==--""".r
+  val BeginBuild = """\[([^\]]+)\] --== Building .+ ==--""".r
+  val EndBuild = """\[([^\]]+)\] --== End Building .+ ==--""".r
+
+  def apply(log: io.Source): Unit = {
+    val dir = new java.io.File("../logs")
+    dir.mkdirs()
+    val lines = log.getLines
+    while (lines.hasNext)
+      lines.next match {
+        case BeginDependencies() =>
+          slurp(lines, makeWriter("../dependencies.log"), EndDependencies)
+        case BeginExtract(name) =>
+          slurp(lines, makeWriter(s"../logs/$name-extract.log"), EndExtract)
+        case BeginBuild(name) =>
+          slurp(lines, makeWriter(s"../logs/$name-build.log"), EndBuild)
+        case _ =>
+      }
+  }
+
+  import java.io.PrintWriter
+
+  private def makeWriter(path: String): PrintWriter = {
+    import java.io._
+    val file = new File(path)
+    val foStream = new FileOutputStream(file, false)  // false = overwrite, don't append
+    val osWriter = new OutputStreamWriter(foStream)
+    new PrintWriter(osWriter)
+  }
+
+  import scala.util.matching.Regex, annotation.tailrec
+
+  def slurp(lines: Iterator[String], writer: java.io.PrintWriter, sentinel: Regex): Unit = {
+    @tailrec def iterate(): Unit =
+      if (lines.hasNext)
+        lines.next match {
+          case sentinel(_) =>
+            writer.close()
+          case line =>
+            writer.println(line)
+            iterate()
+        }
+      else
+        throw new IllegalStateException(s"missing end: $sentinel")
+    iterate()
   }
 
 }
