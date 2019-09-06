@@ -34,24 +34,43 @@ object SuccessReport {
   //   (?!-) = negative lookahead -- next character is not "-"
   val Regex = """\[info\] Project ((?:\w|-(?!-))+)-*: ([^\(]+) \((?:stuck on broken dependencies: )?(.*)\)""".r
 
+  val jdk8Failures = Set(
+    "algebra",          // needs ScalaTest 3.1
+    "circe-jackson",    // needs ScalaTest 3.1
+    "coursier",         // weird git submodule problem when I tried to unfreeze to get 2.13 support. try again I guess
+    "curryhoward",      // no 2.13 upgrade (checked Aug 6 2019)
+    "doobie",           // needs newer cats-effect, which needs ScalaTest 3.1
+    "finagle",          // no 2.13 upgrade (checked Aug 12 2019)
+    "giter8",           // no 2.13 upgrade (checked Aug 6 2019)
+    "kittens",          // needs ScalaTest 3.1
+    "lagom",            // 2.13 support is in master (not 1.5.x) but also needs Akka 2.6
+    "lift-json",        // no 2.13 upgrade (checked Aug 6 2019)
+    "linter",           // no 2.13 upgrade (checked Aug 6 2019)
+    "metaconfig",       // no 2.13 upgrade (checked Aug 6 2019)
+    "metrics-scala",    // needs ScalaTest 3.1
+    "multibot",         // needs ScalaTest 3.1
+    "paradox",          // no 2.13 upgrade (checked Aug 6 2019)
+    "scalastyle",       // no 2.13 upgrade (checked Aug 6 2019)
+    "scrooge-shapes",   // no 2.13 upgrade (checked Aug 12 2019)
+    "tsec",             // needs ScalaTest 3.1
+  )
+
   val jdk11Failures = Set(
-    "coursier",  // needs scala/bug#11125 workaround
-    "doobie",  // needs scala/bug#11125 workaround
-    "multibot",  //  - testScalaInterpreter *** FAILED ***; [java.lang.SecurityException: ("java.lang.RuntimePermission" "accessSystemModules")
-    "sbt-util",  // needs scala/bug#11125 workaround
-    "scala-debugger",  // "object FieldInfo is not a member of package sun.reflect"
-    "scala-refactoring",  // needs scala/bug#11125 workaround?
-    "scalafix",  // needs scala/bug#11125 workaround
     "splain",  // needs scala/bug#11125 workaround
+  )
+
+  val jdk12Failures = Set(
+    "playframework",    // weird javac problem: https://github.com/scala/community-builds/issues/957
   )
 
   val expectedToFail: Set[String] =
     System.getProperty("java.specification.version") match {
       case "1.8" =>
-        Set(
-        )
+        jdk8Failures
+      case "11" =>
+        jdk8Failures ++ jdk11Failures
       case _ =>
-        jdk11Failures
+        jdk8Failures ++ jdk11Failures ++ jdk12Failures
     }
 
   def apply(log: io.Source): Int = {
