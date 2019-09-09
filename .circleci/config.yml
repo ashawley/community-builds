@@ -62,10 +62,21 @@ jobs:
       - run: java -version
       - restore_cache:
           keys:
+            - sbt-deps-v1-{{ .Branch }}-{{ .Revision }}
+            - sbt-deps-v1-{{ .Branch }}
+            - sbt-deps-v1-
+      - restore_cache:
+          keys:
             - clones-v1-{{ .Branch }}-{{ .Revision }}
             - clones-v1-{{ .Branch }}
             - clones-v1-
       - run: ./run.sh
+      - save_cache:
+          key: sbt-deps-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - "~/.ivy2/cache"
+            - "~/.sbt"
+            - "~/.m2"
       - save_cache:
           key: clones-v1-{{ .Branch }}-{{ .Revision }}
           paths:
