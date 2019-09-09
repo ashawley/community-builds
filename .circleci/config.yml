@@ -64,7 +64,7 @@ jobs:
           keys:
             - clones-v1-{{ .Branch }}
             - clones-v1-
-      - run: echo ./run.sh shapeless
+      - run: ./run.sh shapeless
       - save_cache:
           key: clones-v1-{{ .Branch }}
           paths:
