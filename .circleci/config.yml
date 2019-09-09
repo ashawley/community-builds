@@ -43,12 +43,12 @@ jobs:
         description: "Java version"
         default: jdk8
         type: string
+    environment:
+      - LANGUAGE: C.UTF-8
+      - LC_ALL: C.UTF-8
     steps:
       - run: sudo apt-get update
       - run: sudo apt-get install cloc
-      - run: locale
-      - run: sudo dpkg-reconfigure locales
-      - run: locale
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
