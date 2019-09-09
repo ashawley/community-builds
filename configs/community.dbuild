@@ -295,7 +295,6 @@ build += {
     extra.test-tasks: ["compile"]
     // other projects aren't pertinent or errored out (not investigated)
     extra.projects: ["specbaseJVM", "lawkitJVM", "scalatestJVM", "macrosJVM", "platformJVM", "testkitJVM"]
-    extra.test-tasks: ["compile"]
     extra.commands: ${vars.base.extra.commands} [
       "appendScalacOptions -Ymacro-annotations"
       "removeDependency org.scalamacros paradise"
