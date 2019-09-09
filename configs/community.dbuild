@@ -405,6 +405,16 @@ build += {
     ]
   }
 
+  ${vars.base} {
+    name: "scalatestplus-scalacheck"
+    uri:  ${vars.uris.scalatestplus-scalacheck-uri}
+    extra.test-tasks: ["compile"]
+    extra.projects: ["scalatestPlusScalaCheckJVM"]
+    extra.settings: ${vars.base.extra.settings} [
+      "version in ThisBuild := \"1.0.0\""
+    ]
+  }
+
   // this is almost 1M lines of code, but it needn't be green (or be compiled at all)
   // for dependent projects to proceed, so let's keep it separate.  our fork has
   // assorted small changes (that aren't worth thinking about further until we move to 3.1)
