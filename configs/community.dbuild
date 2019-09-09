@@ -445,7 +445,6 @@ build += {
     name: "scalatest-tests"
     uri:  ${vars.uris.scalatest-uri}
     extra.test-tasks: ["compile"]
-    extra.sbt-version: ${vars.sbt-0-13-version}
     extra.exclude: [
       // we already built these above
       "scalatest", "scalactic", "scalacticMacro"
