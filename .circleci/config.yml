@@ -44,6 +44,8 @@ jobs:
         default: jdk8
         type: string
     steps:
+      - run: sudo apt-get update
+      - run: sudo apt-get install cloc
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
