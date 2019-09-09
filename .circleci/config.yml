@@ -46,6 +46,9 @@ jobs:
     steps:
       - run: sudo apt-get update
       - run: sudo apt-get install cloc
+      - run: locale
+      - run: sudo dpkg-reconfigure locales
+      - run: locale
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
@@ -61,7 +64,7 @@ jobs:
           keys:
             - clones-v1-{{ .Branch }}
             - clones-v1-
-      - run: ./run.sh shapeless
+      - run: : ./run.sh shapeless
       - save_cache:
           key: clones-v1-{{ .Branch }}
           paths:
