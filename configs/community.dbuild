@@ -203,7 +203,7 @@ build += {
     name: "scalatest"
     uri:  ${vars.uris.scalatest-uri}
     extra.test-tasks: ["compile"]
-    extra.projects: ["scalatest", "scalactic", "scalatestCompatible"]
+    extra.projects: ["scalatest", "scalactic", "scalatestCompatible", "common-test"]
   }
 
   ${vars.base} {
@@ -424,7 +424,7 @@ build += {
     extra.test-tasks: ["compile"]
     extra.exclude: [
       // we already built these above
-      "scalatest", "scalactic", "scalatestCompatible"
+      "scalatest", "scalactic", "scalatestCompatible", "common-test"
       "*JS", "*Native", "*Dotty"
       // [scalatest-tests] [info] *** 5 SUITES ABORTED ***
       // [scalatest-tests] [info] *** 29 TESTS FAILED ***
