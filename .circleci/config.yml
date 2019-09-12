@@ -70,7 +70,7 @@ jobs:
             - clones-v1-{{ .Branch }}-{{ .Revision }}
             - clones-v1-{{ .Branch }}
             - clones-v1-
-      - run: ./run.sh shapeless
+      - run: ./run.sh scalatestplus-scalacheck
       - save_cache:
           key: sbt-deps-v1-{{ .Branch }}-{{ .Revision }}
           paths:
