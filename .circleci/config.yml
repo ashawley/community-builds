@@ -67,6 +67,9 @@ jobs:
             - sbt-deps-v1-
       - restore_cache:
           keys:
+            - dbuild-v1-{{ .Branch }}-{{ .Revision }}
+            - dbuild-v1-{{ .Branch }}
+            - dbuild-v1-
             - clones-v1-{{ .Branch }}-{{ .Revision }}
             - clones-v1-{{ .Branch }}
             - clones-v1-
@@ -78,9 +81,11 @@ jobs:
             - "~/.sbt"
             - "~/.m2"
       - save_cache:
-          key: clones-v1-{{ .Branch }}-{{ .Revision }}
+          key: dbuild-v1-{{ .Branch }}-{{ .Revision }}
           paths:
             - "clones-0.9.16"
+            - "target-0.9.16/extraction"
+            - "target-0.9.16/sbt-base-dir"
 
 workflows:
   build:

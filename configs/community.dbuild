@@ -109,12 +109,12 @@ vars.base.deps.inject: ["com.lightbend#cloc-plugin"]
 // the effect on disk space usage is, starting March 17 2018
 options.cleanup: {
   extraction: {
-    success: 336
-    failure: 336
+    success: 48
+    failure: 48
   }
   build: {
-    success: 336
-    failure: 336
+    success: 48
+    failure: 48
   }
 }
 
