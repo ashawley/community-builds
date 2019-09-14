@@ -285,6 +285,10 @@ build += {
     name: "discipline"
     uri:  ${vars.uris.discipline-uri}
     extra.test-tasks: ["test:compile"]
+    extra.commands: ${vars.base.extra.commands} [
+      // otherwise sbt-gpg errors on `publish`
+      "set every gpgWarnOnFailure := true"
+    ]
     extra.projects: ["coreJVM"]  // no Scala.js please
   }
 
