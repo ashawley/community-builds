@@ -794,8 +794,6 @@ build += {
       "jawn"
       // bunch more stuff that all depends on jawn
       "parserJVM", "genericJVM", "literalJVM", "scodecJVM", "testingJVM", "testsJVM"
-      // dependency of scrooge-shapes
-      "genericExtrasJVM"
     ]
     extra.commands: ${vars.default-commands} [
       // didn't compile (July 2019) after we unfroze ScalaCheck (StackOverflowError)
