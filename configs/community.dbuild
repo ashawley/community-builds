@@ -640,7 +640,7 @@ build += {
     name: "json4s"
     uri:  ${vars.uris.json4s-uri}
     extra.test-tasks: ["test:compile"]
-    extra.exclude: ["json4s-scalaz"]
+    extra.exclude: ["json4s-scalaz", "json4s-tests"]
     extra.commands: ${vars.default-commands} [
       "set every mimaPreviousArtifacts := Set()"
     ]
