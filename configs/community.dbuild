@@ -411,6 +411,11 @@ build += {
   }
 
   ${vars.base} {
+    name: "scalatestplus-junit"
+    uri:  ${vars.uris.scalatestplus-junit-uri}
+  }
+
+  ${vars.base} {
     name: "scalatestplus-testng"
     uri:  ${vars.uris.scalatestplus-testng-uri}
     extra.test-tasks: ["test:compile"]
