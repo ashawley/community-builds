@@ -70,7 +70,7 @@ jobs:
             - dbuild-v1-{{ .Branch }}-{{ .Revision }}
             - dbuild-v1-{{ .Branch }}
             - dbuild-v1-
-      - run: ./run.sh
+      - run: ./run.sh claimant,expression-evaluator,export-hook,json4s,log4s,machinist,minitest,scalacheck-shapeless,scalatestplus-junit,scalatestplus-scalacheck,scalatestplus-testng,singleton-ops,sourcecode,specs2,tut
       - save_cache:
           key: sbt-deps-v1-{{ .Branch }}-{{ .Revision }}
           paths:
