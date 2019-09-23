@@ -184,7 +184,7 @@ build += {
     extra.commands: ${vars.base.extra.commands} [
       // work around https://github.com/scala/community-builds/issues/575
       // (in a community build context, we don't need MiMa to run)
-      "set every ScalaModulePlugin.mimaPreviousVersion := None"
+      "set every ScalaModulePlugin.scalaModuleMimaPreviousVersion := None"
     ]
   }
 
@@ -215,7 +215,7 @@ build += {
     extra.commands: ${vars.base.extra.commands} [
       // work around https://github.com/scala/community-builds/issues/575
       // (in a community build context, we don't need MiMa to run)
-      "set every ScalaModulePlugin.mimaPreviousVersion := None"
+      "set every ScalaModulePlugin.scalaModuleMimaPreviousVersion := None"
     ]
   }
 
