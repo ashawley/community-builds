@@ -288,6 +288,7 @@ build += {
     extra.commands: ${vars.base.extra.commands} [
       // otherwise sbt-gpg errors on `publish`
       "set every gpgWarnOnFailure := true"
+      "set every credentials := Seq()"
     ]
     extra.projects: ["coreJVM"]  // no Scala.js please
   }
