@@ -789,7 +789,7 @@ build += {
     uri:  ${vars.uris.jawn-0-11-uri}
     extra.test-tasks: ["test:compile"]
     // omitted: benchmark
-    extra.projects: ["ast", "parser", "json4s", "spray", "play"]
+    extra.projects: ["ast", "parser", "json4s"]
   }
 
   // frozen (April 2019) at an April 2019 commit just before ScalaTest 3.1 upgrade
