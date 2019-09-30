@@ -89,6 +89,6 @@ workflows:
   build:
     jobs:
       - scala_job:
-          name: 2.13.0
+          name: 2.13.1
           java_version: jdk8
-          scala_version: 2.13.0
+          scala_version: 2.13.1
