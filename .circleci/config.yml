@@ -70,7 +70,7 @@ jobs:
             - dbuild-v1-{{ .Branch }}-{{ .Revision }}
             - dbuild-v1-{{ .Branch }}
             - dbuild-v1-
-      - run: ./run.sh scala-xml
+      - run: ./run.sh json4s
       - save_cache:
           key: sbt-deps-v1-{{ .Branch }}-{{ .Revision }}
           paths:
