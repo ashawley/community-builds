@@ -80,6 +80,7 @@ jobs:
       - save_cache:
           key: dbuild-v1-{{ .Branch }}-{{ .Revision }}
           paths:
+            - "~/.dbuild"
             - "clones-0.9.16"
             - "target-0.9.16/extraction"
             - "target-0.9.16/sbt-base-dir"
