@@ -254,16 +254,6 @@ build += {
     ]
   }
 
-  // dependency of cats
-  // Forking (Sep 2019) because group id changed in simulacrum.
-  ${vars.base} {
-    name: "export-hook"
-    uri:  ${vars.uris.export-hook-uri}
-    extra.test-tasks: ["test:compile"]
-    extra.sbt-version: ${vars.sbt-0-13-version}
-    extra.projects: ["coreJVM"]  // no Scala.js plz
-  }
-
   ${vars.base} {
     name: "simulacrum"
     uri:  ${vars.uris.simulacrum-uri}
