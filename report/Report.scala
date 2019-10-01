@@ -34,33 +34,31 @@ object SuccessReport {
   //   (?!-) = negative lookahead -- next character is not "-"
   val Regex = """\[info\] Project ((?:\w|-(?!-))+)-*: ([^\(]+) \((?:stuck on broken dependencies: )?(.*)\)""".r
 
-  val jdk8Failures = Set(
+  val jdk8Failures = Set[String](
     "algebra",          // needs ScalaTest 3.1
     "circe-jackson",    // needs ScalaTest 3.1
     "coursier",         // weird git submodule problem when I tried to unfreeze to get 2.13 support. try again I guess
     "curryhoward",      // no 2.13 upgrade (checked Aug 6 2019)
     "doobie",           // needs newer cats-effect, which needs ScalaTest 3.1
-    "finagle",          // no 2.13 upgrade (checked Aug 12 2019)
-    "giter8",           // no 2.13 upgrade (checked Aug 6 2019)
     "kittens",          // needs ScalaTest 3.1
     "lagom",            // 2.13 support is in master (not 1.5.x) but also needs Akka 2.6
     "lift-json",        // no 2.13 upgrade (checked Aug 6 2019)
-    "linter",           // no 2.13 upgrade (checked Aug 6 2019)
     "metaconfig",       // no 2.13 upgrade (checked Aug 6 2019)
     "metrics-scala",    // needs ScalaTest 3.1
     "multibot",         // needs ScalaTest 3.1
     "paradox",          // no 2.13 upgrade (checked Aug 6 2019)
+    "scala-js",         // https://github.com/scala-js/scala-js/issues/3785
     "scalastyle",       // no 2.13 upgrade (checked Aug 6 2019)
     "scrooge-shapes",   // no 2.13 upgrade (checked Aug 12 2019)
     "squants",          // no 2.13 upgrade (checked Sep 16 2019)
     "tsec",             // needs ScalaTest 3.1
   )
 
-  val jdk11Failures = Set(
+  val jdk11Failures = Set[String](
     "splain",  // needs scala/bug#11125 workaround
   )
 
-  val jdk12Failures = Set(
+  val jdk12Failures = Set[String](
     "playframework",    // weird javac problem: https://github.com/scala/community-builds/issues/957
   )
 

@@ -611,6 +611,8 @@ build += {
     name: "squants"
     uri:  ${vars.uris.squants-uri}
     extra.projects: ["squantsJVM"]
+    // reenable once fix for https://github.com/typelevel/squants/issues/356 is merged
+    extra.test-tasks: ["compile"]
   }
 
   ${vars.base} {
@@ -828,6 +830,10 @@ build += {
   }
 
   // in this space because it depends on pureconfig
+  // frozen (September 2019) at a July 2019 commit before this error occurred:
+  //    Processing subproject: catsJVM
+  //    **** Missing dependency: the library org.typelevel#discipline-scalatest is not provided
+  // let's revisit when we move to ScalaTest 3.1
   ${vars.base} {
     name: "refined"
     uri:  ${vars.uris.refined-uri}
