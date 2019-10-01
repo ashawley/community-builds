@@ -263,6 +263,9 @@ build += {
     extra.projects: ["coreJVM"]  // no Scala.js plz
   }
 
+  // Freezing (Sep 2019) because group id changes.  This breaks
+  // export-hook because dbuild is using the new group id
+  // org.typelevel, but export-hook uses com.github.mpilquist.
   ${vars.base} {
     name: "simulacrum"
     uri:  ${vars.uris.simulacrum-uri}
