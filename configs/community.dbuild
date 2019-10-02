@@ -353,6 +353,8 @@ build += {
     // ApplicativeSuite.  the repo's own .jvmopts has 6g
     extra.options: ["-Xmx6g"]
     extra.commands: ${vars.default-commands} [
+      // because scodec-build brings in sbt-gpg which errors on `publish`
+      "set every gpgWarnOnFailure := true"
       // intermittent failures
       """set tests.jvm / Test / unmanagedSources / excludeFilter := HiddenFileFilter || "ApplicativeSuite.scala""""
     ]
