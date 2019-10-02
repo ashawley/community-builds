@@ -358,6 +358,7 @@ build += {
       // intermittent failures
       """set tests.jvm / Test / unmanagedSources / excludeFilter := HiddenFileFilter || "ApplicativeSuite.scala""""
     ]
+    check-missing: false
   }
 
   // frozen (June 2019) at June 2019 commit just before ScalaTest 3.1 upgrade.
