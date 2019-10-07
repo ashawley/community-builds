@@ -3,7 +3,7 @@ object Report extends App {
   ClocReport(log)
   val unexpectedFailureCount = SuccessReport(log)
   SplitLog(log)
-  sys.exit(unexpectedFailureCount)
+  sys.exit(unexpectedFailureCount.getOrElse(1))
 }
 
 object ClocReport {
@@ -47,7 +47,6 @@ object SuccessReport {
     "metrics-scala",    // needs ScalaTest 3.1
     "multibot",         // needs ScalaTest 3.1
     "paradox",          // no 2.13 upgrade (checked Aug 6 2019)
-    "scala-js",         // https://github.com/scala-js/scala-js/issues/3785
     "scalastyle",       // no 2.13 upgrade (checked Aug 6 2019)
     "scrooge-shapes",   // no 2.13 upgrade (checked Aug 12 2019)
     "squants",          // no 2.13 upgrade (checked Sep 16 2019)
@@ -58,7 +57,7 @@ object SuccessReport {
     "splain",  // needs scala/bug#11125 workaround
   )
 
-  val jdk12Failures = Set[String](
+  val jdk13Failures = Set[String](
     "playframework",    // weird javac problem: https://github.com/scala/community-builds/issues/957
   )
 
@@ -69,10 +68,10 @@ object SuccessReport {
       case "11" =>
         jdk8Failures ++ jdk11Failures
       case _ =>
-        jdk8Failures ++ jdk11Failures ++ jdk12Failures
+        jdk8Failures ++ jdk11Failures ++ jdk13Failures
     }
 
-  def apply(log: io.Source): Int = {
+  def apply(log: io.Source): Option[Int] = {
     val lines = log.getLines.dropWhile(!_.contains("---==  Execution Report ==---"))
     var success, failed, didNotRun = 0
     val unexpectedSuccesses = collection.mutable.Buffer[String]()
@@ -80,6 +79,8 @@ object SuccessReport {
     val blockerCounts = collection.mutable.Map[String, Int]()
     for (Regex(name, status, blockers) <- lines)
       status match {
+        case "EXTRACTION FAILED" =>
+          return None
         case "SUCCESS" =>
           success += 1
           if (expectedToFail(name))
@@ -98,23 +99,23 @@ object SuccessReport {
     if (!unexpectedFailures.isEmpty) {
       val counts = blockerCounts.withDefaultValue(0)
       val uf = unexpectedFailures.sortBy(counts).reverse.mkString(",")
-      println(s"FAILED: $uf")
+      println(s"FAILURES (UNEXPECTED): $uf")
     }
     if (didNotRun > 0) {
       val blockers =
         blockerCounts.toList.sortBy(_._2).reverse
           .collect{case (blocker, count) => s"$blocker ($count)"}
           .mkString(", ")
-      println(s"BLOCKERS: $blockers")
+      println(s"BLOCKING DOWNSTREAM: $blockers")
     }
     if (unexpectedSuccesses.nonEmpty) {
       val us = unexpectedSuccesses.mkString(",")
-      println(s"UNEXPECTED SUCCESSES: $us")
+      println(s"SUCCESSES (UNEXPECTED): $us")
     }
     println(s"FAILED: $failed")
-    println(s"DID NOT RUN: $didNotRun")
+    println(s"BLOCKED, DID NOT RUN: $didNotRun")
     println(s"TOTAL: $total")
-    unexpectedFailures.size
+    Some(unexpectedFailures.size)
   }
 
 }
@@ -167,7 +168,7 @@ object SplitLog {
             iterate()
         }
       else
-        throw new IllegalStateException(s"missing end: $sentinel")
+        writer.close()
     iterate()
   }
 
