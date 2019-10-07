@@ -412,6 +412,7 @@ build += {
     name: "scalatestplus-scalacheck"
     uri:  ${vars.uris.scalatestplus-scalacheck-uri}
     extra.test-tasks: ["test:compile"]
+    extra.sbt-version: ${vars.sbt-1-2-version}
     extra.projects: ["scalatestPlusScalaCheckJVM"]
     extra.settings: ${vars.base.extra.settings} [
       "version in ThisBuild := \"1.0.0\""
