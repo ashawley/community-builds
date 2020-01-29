@@ -1,8 +1,10 @@
 object Report extends App {
   def log = io.Source.fromFile(args(0))
+  println("<pre>")
   ClocReport(log)
   val unexpectedFailureCount = SuccessReport(log)
   SplitLog(log)
+  println("</pre>")
   sys.exit(unexpectedFailureCount.getOrElse(1))
 }
 
@@ -35,30 +37,16 @@ object SuccessReport {
   val Regex = """\[info\] Project ((?:\w|-(?!-))+)-*: ([^\(]+) \((?:stuck on broken dependencies: )?(.*)\)""".r
 
   val jdk8Failures = Set[String](
-    "algebra",          // needs ScalaTest 3.1
-    "circe-jackson",    // needs ScalaTest 3.1
-    "coursier",         // weird git submodule problem when I tried to unfreeze to get 2.13 support. try again I guess
-    "curryhoward",      // no 2.13 upgrade (checked Aug 6 2019)
-    "doobie",           // needs newer cats-effect, which needs ScalaTest 3.1
-    "kittens",          // needs ScalaTest 3.1
-    "lagom",            // 2.13 support is in master (not 1.5.x) but also needs Akka 2.6
-    "lift-json",        // no 2.13 upgrade (checked Aug 6 2019)
-    "metaconfig",       // no 2.13 upgrade (checked Aug 6 2019)
-    "metrics-scala",    // needs ScalaTest 3.1
-    "multibot",         // needs ScalaTest 3.1
-    "paradox",          // no 2.13 upgrade (checked Aug 6 2019)
-    "scalastyle",       // no 2.13 upgrade (checked Aug 6 2019)
-    "scrooge-shapes",   // no 2.13 upgrade (checked Aug 12 2019)
-    "squants",          // no 2.13 upgrade (checked Sep 16 2019)
-    "tsec",             // needs ScalaTest 3.1
   )
 
   val jdk11Failures = Set[String](
-    "splain",  // needs scala/bug#11125 workaround
   )
 
-  val jdk13Failures = Set[String](
-    "playframework",    // weird javac problem: https://github.com/scala/community-builds/issues/957
+  val jdk14Failures = Set[String](
+    "blaze",  // test failure (org.http4s.blaze.pipeline.stages.SSLStageSpec)
+    "paradox",  // Unsupported class file major version
+    "playframework",  // Failed tests: play.mvc.HttpFormsTest
+    "twitter-util",  // Unrecognized VM option 'AggressiveOpts'
   )
 
   val expectedToFail: Set[String] =
@@ -68,7 +56,7 @@ object SuccessReport {
       case "11" =>
         jdk8Failures ++ jdk11Failures
       case _ =>
-        jdk8Failures ++ jdk11Failures ++ jdk13Failures
+        jdk8Failures ++ jdk11Failures ++ jdk14Failures
     }
 
   def apply(log: io.Source): Option[Int] = {
@@ -96,9 +84,10 @@ object SuccessReport {
       }
     val total = success + failed + didNotRun
     println(s"SUCCEEDED: $success")
-    if (!unexpectedFailures.isEmpty) {
-      val counts = blockerCounts.withDefaultValue(0)
-      val uf = unexpectedFailures.sortBy(counts).reverse.mkString(",")
+    val sortedFailures =
+      unexpectedFailures.sortBy(blockerCounts.withDefaultValue(0)).reverse
+    if (unexpectedFailures.nonEmpty) {
+      val uf = sortedFailures.mkString(",")
       println(s"FAILURES (UNEXPECTED): $uf")
     }
     if (didNotRun > 0) {
@@ -115,7 +104,16 @@ object SuccessReport {
     println(s"FAILED: $failed")
     println(s"BLOCKED, DID NOT RUN: $didNotRun")
     println(s"TOTAL: $total")
-    Some(unexpectedFailures.size)
+    for (url <- Option(System.getenv("BUILD_URL")))
+      if (unexpectedFailures.nonEmpty) {
+        println()
+        for (failed <- sortedFailures)
+          println(s"""<a href="${url}artifact/logs/$failed-build.log">$failed</a>""")
+      }
+    if (success == 0)
+      Some(1)
+    else
+      Some(unexpectedFailures.size)
   }
 
 }
@@ -136,7 +134,7 @@ object SplitLog {
     while (lines.hasNext)
       lines.next match {
         case BeginDependencies() =>
-          slurp(lines, makeWriter("../dependencies.log"), EndDependencies)
+          slurp(lines, makeWriter("../dependencies.txt"), EndDependencies)
         case BeginExtract(name) =>
           slurp(lines, makeWriter(s"../logs/$name-extract.log"), EndExtract)
         case BeginBuild(name) =>
