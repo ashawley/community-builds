@@ -70,7 +70,7 @@ jobs:
             - dbuild-v1-{{ .Branch }}-{{ .Revision }}
             - dbuild-v1-{{ .Branch }}
             - dbuild-v1-
-      - run: ./run.sh algebra,better-monadic-for,decline,jsoniter-scala,kittens,libra,monocle,mouse,paiges,refined,scalatestplus-scalacheck,spire
+      - run: ./run.sh shapeless
       - save_cache:
           key: sbt-deps-v1-{{ .Branch }}-{{ .Revision }}
           paths:
